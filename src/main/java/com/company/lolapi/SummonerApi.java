@@ -1,4 +1,4 @@
-package lolapi;
+package com.company.lolapi;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

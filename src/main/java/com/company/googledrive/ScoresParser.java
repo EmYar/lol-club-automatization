@@ -1,7 +1,7 @@
-package googledrive;
+package com.company.googledrive;
 
+import com.company.entity.Pair;
 import com.google.api.services.sheets.v4.Sheets;
-import entity.Pair;
 import one.util.streamex.StreamEx;
 
 import java.time.LocalDate;

@@ -1,4 +1,4 @@
-package entity;
+package com.company.entity;
 
 public class Pair<T, K> {
     private T first;

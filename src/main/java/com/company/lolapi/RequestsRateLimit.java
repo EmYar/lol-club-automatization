@@ -1,4 +1,4 @@
-package lolapi;
+package com.company.lolapi;
 
 public interface RequestsRateLimit extends Comparable<RequestsRateLimit> {
 

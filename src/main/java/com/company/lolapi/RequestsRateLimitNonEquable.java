@@ -1,4 +1,4 @@
-package lolapi;
+package com.company.lolapi;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class RequestsRateLimitNonEquable implements RequestsRateLimit {
         if (!executorService.isShutdown()) {
             if (future == null) {
                 future = executorService.submit(waitTask);
-            } else if (currentRequestsCount.intValue() == maxRequestsCount) {
+            } else if (currentRequestsCount.intValue() >= maxRequestsCount) { //todo: fix >=
                 try {
                     future.get();
                     future = null;

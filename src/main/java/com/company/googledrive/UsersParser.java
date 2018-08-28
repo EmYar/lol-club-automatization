@@ -1,9 +1,9 @@
-package googledrive;
+package com.company.googledrive;
 
+import com.company.entity.Pair;
+import com.company.entity.Role;
+import com.company.entity.User;
 import com.google.api.services.sheets.v4.Sheets;
-import entity.Pair;
-import entity.Role;
-import entity.User;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class UsersParser extends GDriveParser<Map<String, User>> {
-    private static final String RANGE = "A2:E";
+    private static final String RANGE = "A2:F";
     private static final int ID_COLUMN = 0;
     private static final int NAME_COLUMN = 1;
     private static final int VK_PAGE_COLUMN = 2;

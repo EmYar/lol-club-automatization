@@ -1,6 +1,6 @@
-package googledrive;
+package com.company.googledrive;
 
-import entity.Pair;
+import com.company.entity.Pair;
 
 class Constants {
     static final Pair<String, String> ROLES_SHEET = new Pair<>("1Y5FMMHgnNjhZACaxljukSzQEmYndCCuI9keR7Puhv1g", "Список");

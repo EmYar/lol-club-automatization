@@ -1,4 +1,4 @@
-package googledrive;
+package com.company.googledrive;
 
 public class ParsingException extends Exception {
 

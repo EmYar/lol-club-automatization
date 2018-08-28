@@ -1,5 +1,6 @@
-package googledrive;
+package com.company.googledrive;
 
+import com.company.entity.Pair;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -14,7 +15,6 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import entity.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 
 public abstract class GDriveParser<T> {
-
     private static final String CLIENT_SECRET_FILE = "client_secret.json";
     private static final String CREDENTIALS_FOLDER = "credentials";
     private static final Collection<String> SCOPES = List.of(SheetsScopes.SPREADSHEETS);

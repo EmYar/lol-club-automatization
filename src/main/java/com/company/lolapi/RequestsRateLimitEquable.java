@@ -1,9 +1,12 @@
-package lolapi;
+package com.company.lolapi;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class RequestsRateLimitEquable implements RequestsRateLimit {
     private static final Logger log = LoggerFactory.getLogger(RequestsRateLimitEquable.class);
@@ -19,6 +22,7 @@ public class RequestsRateLimitEquable implements RequestsRateLimit {
         future = null;
         waitTask = () -> {
             try {
+                System.out.println("waiting");
                 Thread.sleep(cooldown);
             } catch (InterruptedException e) {
                 log.error(e.getMessage(), e);
@@ -29,20 +33,26 @@ public class RequestsRateLimitEquable implements RequestsRateLimit {
 
     @Override
     public void acquire() {
-        if (!executorService.isShutdown()) {
-            if (future == null) {
-                future = executorService.submit(waitTask);
-            } else {
-                try {
-                    future.get();
-                    future = null;
-                } catch (InterruptedException | ExecutionException e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        } else {
-            log.error("ExecutorService is shutted down");
+        //todo fix this
+        try {
+            Thread.sleep(cooldown);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
         }
+//        if (!executorService.isShutdown()) {
+//            if (future == null) {
+//                future = executorService.submit(waitTask);
+//            } else {
+//                try {
+//                    future.get();
+//                    future = null;
+//                } catch (InterruptedException | ExecutionException e) {
+//                    log.error(e.getMessage(), e);
+//                }
+//            }
+//        } else {
+//            log.error("ExecutorService is shutted down");
+//        }
     }
 
     @Override

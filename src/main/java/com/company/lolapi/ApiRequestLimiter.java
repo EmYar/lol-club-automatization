@@ -1,4 +1,4 @@
-package lolapi;
+package com.company.lolapi;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +13,7 @@ public class ApiRequestLimiter {
         this.limits = Collections.unmodifiableList(limits);
     }
 
-    public static ApiRequestLimiterBuilder build() {
+    public static ApiRequestLimiterBuilder builder() {
         return new ApiRequestLimiterBuilder();
     }
 
