@@ -1,4 +1,4 @@
-package com.company.entity;
+package com.company.googledrive.entity;
 
 public class Role {
 

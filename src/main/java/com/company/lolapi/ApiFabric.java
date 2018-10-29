@@ -41,9 +41,10 @@ public class ApiFabric {
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(chain -> {
                     Request request = chain.request();
+                    String apiKey = Resources.toString(Resources.getResource("lol_api_key"), Charsets.UTF_8);
                     request = request.newBuilder()
                             .addHeader("Accept-Charset", "application/x-www-form-urlencoded; charset=UTF-8")
-                            .addHeader("X-Riot-Token", Resources.toString(Resources.getResource("lol_api_key"), Charsets.UTF_8))
+                            .addHeader("X-Riot-Token", apiKey)
                             .addHeader("Accept-Language", "ru,en-US;q=0.7,en;q=0.3")
                             .build();
 

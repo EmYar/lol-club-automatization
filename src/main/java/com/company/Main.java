@@ -1,35 +1,19 @@
 package com.company;
 
-import com.company.lolapi.ApiFabric;
-import com.company.lolapi.Summoner;
+import com.company.googledrive.Parser;
+import com.company.googledrive.entity.User;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) {
-//        com.company.ScoreChecker scoreChecker = new com.company.ScoreChecker();
-//        scoreChecker.getActiveUsers();
-//        try {
-//            System.out.println(ScoresParser.getInstance().parse());
-//        } catch (ParsingException e) {
-//            e.printStackTrace();
-//        }
-
-//        int i = 1;
-//        ApiRequestLimiter limiter = ApiRequestLimiter.builder()
-//                .add(1, TimeUnit.SECONDS, 1)
-//                .add(4, TimeUnit.SECONDS, 5, false)
-//                .build();
-//        while (true) {
-//            limiter.acquire();
-//            System.out.println(LocalTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME) + " " + String.valueOf(i++));
-//        }
-
         try {
-            Summoner summoner = ApiFabric.getInstance().getSummonerApi().getSummonerByName("Elesey").execute().body();
-            summoner.getAccountId();
-        } catch (IOException e) {
+            List<User> users = Parser.parse(User.class);
+            users.size();
+        } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
         }
     }
