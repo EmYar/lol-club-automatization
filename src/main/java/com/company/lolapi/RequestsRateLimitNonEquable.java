@@ -56,4 +56,9 @@ public class RequestsRateLimitNonEquable implements RequestsRateLimit {
     public long getCooldown() {
         return cooldown;
     }
+
+    @Override
+    public void shutdown() {
+        executorService.shutdownNow();
+    }
 }

@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.concurrent.TimeUnit;
 
-public class ApiFabric {
+public class ApiFabric implements AutoCloseable {
     private static final String BASE_URL = "https://ru.api.riotgames.com/";
 
     private static ApiFabric ourInstance;
@@ -35,6 +35,10 @@ public class ApiFabric {
             summonerApi = getRetrofit().create(SummonerApi.class);
         }
         return summonerApi;
+    }
+
+    public void close() {
+        limiter.close();
     }
 
     private Retrofit getRetrofit() {

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-public class ApiRequestLimiter {
+public class ApiRequestLimiter implements AutoCloseable {
     private final List<RequestsRateLimit> limits;
 
     protected ApiRequestLimiter(List<RequestsRateLimit> limits) {
@@ -30,6 +30,13 @@ public class ApiRequestLimiter {
     public void acquire() {
         for (RequestsRateLimit limit : limits) {
             limit.acquire();
+        }
+    }
+
+    @Override
+    public void close() {
+        for (RequestsRateLimit limit : limits) {
+            limit.shutdown();
         }
     }
 

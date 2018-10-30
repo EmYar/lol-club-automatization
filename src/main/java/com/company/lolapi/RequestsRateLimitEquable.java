@@ -22,7 +22,6 @@ public class RequestsRateLimitEquable implements RequestsRateLimit {
         future = null;
         waitTask = () -> {
             try {
-                System.out.println("waiting");
                 Thread.sleep(cooldown);
             } catch (InterruptedException e) {
                 log.error(e.getMessage(), e);
@@ -58,5 +57,10 @@ public class RequestsRateLimitEquable implements RequestsRateLimit {
     @Override
     public long getCooldown() {
         return cooldown;
+    }
+
+    @Override
+    public void shutdown() {
+        executorService.shutdownNow();
     }
 }

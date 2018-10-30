@@ -4,6 +4,7 @@ public interface RequestsRateLimit extends Comparable<RequestsRateLimit> {
 
     void acquire();
     long getCooldown();
+    void shutdown();
 
     @Override
     default int compareTo(RequestsRateLimit o) {

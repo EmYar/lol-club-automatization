@@ -13,33 +13,66 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import one.util.streamex.StreamEx;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public class Parser {
-    private static final String APPLICATION_NAME = "The King's bot";
-    private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+    private static Logger LOG = LoggerFactory.getLogger(Parser.class);
 
-    private static Map<Class<? extends GDriveEntity>, ? extends EntityParseInfo<? extends GDriveEntity>> map =
-            Map.of(User.class, new UserParseInfo());
+    private static final String CLIENT_SECRET_FILE = "client_secret.json";
+    private static final String CREDENTIALS_FOLDER = "credentials";
+    private static final Collection<String> SCOPES = List.of(SheetsScopes.SPREADSHEETS);
 
-    public static <T extends GDriveEntity> List<T> parse(Class<T> entityClass) throws GeneralSecurityException, IOException {
-        EntityParseInfo<T> parseInfo = (EntityParseInfo<T>) map.get(entityClass);
-        NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, parseInfo))
-                .setApplicationName(APPLICATION_NAME)
+    private static Parser instance = null;
+
+    private final String applicationName;
+    private final JsonFactory jsonFactory;
+    private final NetHttpTransport httpTransport;
+    private final Sheets service;
+
+    private final Map<Class<? extends GDriveEntity>, ? extends EntityInfo> entityInfoMap;
+
+    private Parser() throws GeneralSecurityException, IOException {
+        applicationName = "The King's bot";
+        jsonFactory = JacksonFactory.getDefaultInstance();
+        httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        service = new Sheets.Builder(httpTransport, jsonFactory, getCredentials(httpTransport))
+                .setApplicationName(applicationName)
                 .build();
+        entityInfoMap = Map.of(User.class, new UserInfo());
+    }
+
+    public static Parser getInstance() {
+        if (instance == null) {
+            try {
+                instance = new Parser();
+            } catch (GeneralSecurityException | IOException e) {
+                LOG.error("Failed to create {} instance", Parser.class.getSimpleName(), e);
+            }
+        }
+        return instance;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends GDriveEntity> List<T> parse(Class<T> entityClass) throws IOException {
+        EntityInfo<T> parseInfo = (EntityInfo<T>) entityInfoMap.get(entityClass);
         ValueRange response = service.spreadsheets().values()
                 .get(parseInfo.spreadsheetId, parseInfo.sheetId + "!" + parseInfo.range)
                 .execute();
-        int i = 0;
+        int i = parseInfo.firstRow;
         List<T> result = new ArrayList<>(response.getValues().size());
         for (List<Object> row : response.getValues()) {
             result.add(parseInfo.parseEntity(row, i++));
@@ -48,14 +81,27 @@ public class Parser {
         return result;
     }
 
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, EntityParseInfo parseInfo) throws IOException {
-        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        InputStream in = classloader.getResourceAsStream(parseInfo.clientSecretFile);
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+    @SuppressWarnings("unchecked")
+    public <T extends GDriveEntity> void update(Class<T> entityClass, List<T> entities) throws IOException {
+        EntityInfo<T> parseInfo = (EntityInfo<T>) entityInfoMap.get(entityClass);
 
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY,
-                clientSecrets, parseInfo.scopes)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(parseInfo.credentialsFolder)))
+        service.spreadsheets().values()
+                .batchUpdate(parseInfo.spreadsheetId, new BatchUpdateValuesRequest()
+                        .setValueInputOption("USER_ENTERED")
+                        .setData(StreamEx.of(entities)
+                                .map(parseInfo::toValueRange)
+                                .toList()))
+                .execute();
+    }
+
+    private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
+        ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        InputStream in = classloader.getResourceAsStream(CLIENT_SECRET_FILE);
+        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new InputStreamReader(in));
+
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, jsonFactory,
+                clientSecrets, SCOPES)
+                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(CREDENTIALS_FOLDER)))
                 .setAccessType("offline")
                 .build();
         return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");

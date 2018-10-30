@@ -1,20 +1,18 @@
 package com.company;
 
-import com.company.googledrive.Parser;
-import com.company.googledrive.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.List;
 
 public class Main {
+    private final static Logger LOG = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         try {
-            List<User> users = Parser.parse(User.class);
-            users.size();
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+            NamesUpdater.run();
+        } catch (IOException e) {
+            LOG.error("Failed to update names", e);
         }
     }
 }
