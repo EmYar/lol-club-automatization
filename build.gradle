@@ -1,15 +1,53 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'edu.sc.seis.gradle:launch4j:2.4.4'
+    }
+}
+
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.2.71'
 }
 apply plugin: 'java'
 apply plugin: 'application'
+apply plugin: 'edu.sc.seis.launch4j'
 
-sourceCompatibility = 1.10
-targetCompatibility = 1.10
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
 version = '1.0'
 
 repositories {
     mavenCentral()
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.company.Main'
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+launch4j {
+    bundledJrePath = 'C:\\Program Files\\Java\\jdk-11' //todo fix it
+    bundledJre64Bit = true
+    mainClassName = 'com.company.Main'
 }
 
 dependencies {
@@ -20,24 +58,19 @@ dependencies {
 
     compile 'org.slf4j:slf4j-api:1.6.1'
     compile 'ch.qos.logback:logback-classic:1.0.13'
+    compile 'uk.org.lidalia:sysout-over-slf4j:1.0.2'
 
     compile 'org.apache.commons:commons-lang3:3.7'
 
-    implementation 'one.util:streamex:0.6.7'
+    compile 'one.util:streamex:0.6.7'
 
     compile 'com.squareup.retrofit2:retrofit:2.4.0'
     compile 'com.squareup.retrofit2:converter-gson:2.4.0'
 
     compile 'org.jetbrains:annotations:16.0.2'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-}
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
+
+    compile "org.openjfx:javafx-base:11:win"
+    compile "org.openjfx:javafx-graphics:11:win"
+    compile "org.openjfx:javafx-controls:11:win"
 }

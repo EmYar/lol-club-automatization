@@ -26,10 +26,7 @@ public class RequestsRateLimitNonEquable implements RequestsRateLimit {
             try {
                 Thread.sleep(cooldown);
                 currentRequestsCount.set(0);
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
-                executorService.shutdownNow();
-            }
+            } catch (InterruptedException ignore) {}
         };
     }
 

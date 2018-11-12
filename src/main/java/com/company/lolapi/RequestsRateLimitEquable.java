@@ -23,10 +23,7 @@ public class RequestsRateLimitEquable implements RequestsRateLimit {
         waitTask = () -> {
             try {
                 Thread.sleep(cooldown);
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
-                executorService.shutdownNow();
-            }
+            } catch (InterruptedException ignore) {}
         };
     }
 

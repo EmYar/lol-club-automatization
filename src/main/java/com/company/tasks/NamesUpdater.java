@@ -1,4 +1,4 @@
-package com.company;
+package com.company.tasks;
 
 import com.company.googledrive.Parser;
 import com.company.googledrive.entity.User;
@@ -13,13 +13,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NamesUpdater {
-    private static final Logger log = LoggerFactory.getLogger(NamesUpdater.class);
+public class NamesUpdater implements BotTask {
+    private static final Logger LOG = LoggerFactory.getLogger(NamesUpdater.class);
 
-    public static void run() throws IOException {
+    public void run() {
+        LOG.info("NamesUpdater started");
         Parser parser = Parser.getInstance();
-        List<User> users = parser.parse(User.class);
         try (ApiFabric apiFabric = ApiFabric.getInstance()) {
+            List<User> users = parser.parse(User.class);
+            LOG.info("{} users parsed", users.size());
             SummonerApi summonerApi = apiFabric.getSummonerApi();
             List<User> usersToSave = new ArrayList<>();
             for (User user : users) {
@@ -31,12 +33,14 @@ public class NamesUpdater {
                         && (summoner = summonerApi.getSummonerByAccountId(user.getAccountId()).execute().body()) != null) {
                     if (!StringUtils.equals(user.getName(), summoner.getName())) {
                         user.setName(summoner.getName());
+                        LOG.info("User {} has outdated name", user.getAccountId());
                         usersToSave.add(user);
                     }
                 } else {
                     summoner = summonerApi.getSummonerByName(user.getName()).execute().body();
                     if (summoner != null) {
                         user.setAccountId(summoner.getAccountId());
+                        LOG.info("User {} has no accountId");
                         usersToSave.add(user);
                     }
                 }
@@ -44,6 +48,10 @@ public class NamesUpdater {
             if (!usersToSave.isEmpty()) {
                 parser.update(User.class, usersToSave);
             }
+            LOG.info("Updated {} users", usersToSave.size());
+        } catch (IOException e) {
+            LOG.error("Failed to update names", e);
         }
+        LOG.info("NamesUpdater completed");
     }
 }

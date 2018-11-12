@@ -1,18 +1,18 @@
 package com.company;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.company.tasks.TaskType;
+import one.util.streamex.StreamEx;
+import uk.org.lidalia.sysoutslf4j.context.SysOutOverSLF4J;
 
-import java.io.IOException;
+import java.util.Set;
 
 public class Main {
-    private final static Logger LOG = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        try {
-            NamesUpdater.run();
-        } catch (IOException e) {
-            LOG.error("Failed to update names", e);
-        }
+        SysOutOverSLF4J.sendSystemOutAndErrToSLF4J();
+        Set<String> arguments = Set.of(args);
+        StreamEx.of(TaskType.values())
+                .filter(taskType -> arguments.contains(taskType.getCommand()))
+                .forEachOrdered(TaskType::runTask);
     }
 }

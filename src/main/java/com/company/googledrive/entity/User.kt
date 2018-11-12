@@ -1,5 +1,6 @@
 package com.company.googledrive.entity
 
+import org.apache.commons.lang3.StringUtils
 import java.time.LocalDate
 
 class User(spreadsheetId: String,
@@ -15,9 +16,11 @@ class User(spreadsheetId: String,
 
     var name: String = name
         set(value) {
-            if (oldNames == null)
-                oldNames = mutableSetOf()
-            oldNames!! += name
+            if (StringUtils.isNotBlank(field)) {
+                if (oldNames == null)
+                    oldNames = mutableSetOf()
+                oldNames!! += name
+            }
             field = value
         }
 
