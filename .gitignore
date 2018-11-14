@@ -28,5 +28,7 @@ hs_err_pid*
 .idea/
 credentials/
 out/
+build/
+src/test/
 /src/main/resources/client_secret.json
 /src/main/resources/lol_api_key
