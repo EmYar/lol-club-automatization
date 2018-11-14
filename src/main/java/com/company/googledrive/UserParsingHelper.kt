@@ -2,31 +2,30 @@ package com.company.googledrive
 
 import com.company.googledrive.entity.User
 import com.google.api.services.sheets.v4.model.ValueRange
-import one.util.streamex.StreamEx
 import org.apache.commons.lang3.StringUtils
-
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-class UserInfo : EntityInfo<User>(
+class UserParsingHelper : EntityParsingHelper<User>(
         "1J_rjMFYuTI8FBGqBU9EwN2hQCulDuL8K3it_eFOZfTA",
         "Участники",
         "A2:G",
         2) {
 
     override fun parseEntity(row: List<Any>, rowNum: Int): User {
-        val oldNames = StreamEx.of((row[4] as String).split("; "))
-                .filter(StringUtils::isNotBlank)
-                .toSet()
-        val joinDate = if (row.size == 7)
-            try {
-                LocalDate.parse(row[6] as CharSequence, FORMATTER)
-            } catch (e: DateTimeParseException) {
-                LocalDate.parse(row[6] as CharSequence, SECOND_FORMATTER)
-            }
-        else
-            null
+        val oldNames = (row[4] as String).split("; ")
+                .filter { StringUtils.isNotBlank(it) }
+                .toMutableSet()
+        val joinDate =
+                if (row.size == 7)
+                    try {
+                        LocalDate.parse(row[6] as CharSequence, FORMATTER)
+                    } catch (e: DateTimeParseException) {
+                        LocalDate.parse(row[6] as CharSequence, SECOND_FORMATTER)
+                    }
+                else
+                    null
 
         return User(spreadsheetId,
                 sheetId,
