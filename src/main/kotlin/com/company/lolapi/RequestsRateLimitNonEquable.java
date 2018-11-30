@@ -50,7 +50,7 @@ public class RequestsRateLimitNonEquable implements RequestsRateLimit {
     }
 
     @Override
-    public long getCooldown() {
+    public long getCooldownTime() {
         return cooldown;
     }
 

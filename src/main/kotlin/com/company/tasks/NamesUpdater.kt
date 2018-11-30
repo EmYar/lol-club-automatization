@@ -5,6 +5,7 @@ import com.company.googledrive.entity.User
 import com.company.lolapi.ApiFabric
 import com.company.lolapi.Summoner
 import com.company.tasks.NamesUpdater.UpdateResult.Result
+import one.util.streamex.StreamEx
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -66,7 +67,9 @@ class NamesUpdater : Task {
 
     data class UpdateResult(val user: User?, val summoner: Summoner?, val status: Result?) : TaskResult {
         override fun toString(): String {
-            return "NamesUpdater: " + user?.accountId + " " + user?.name + " " + status
+            return StreamEx.of("NamesUpdater:", user?.accountId, user?.name, status)
+                    .nonNull()
+                    .joining(" ")
         }
 
         enum class Result { NAME_UPDATED, ACCOUNT_ID_ADDED, NOT_MATCH }
