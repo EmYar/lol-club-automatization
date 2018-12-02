@@ -15,36 +15,10 @@ class ApiRequestLimiter {
                 .build()
         val limitTime = timeUnit.toMillis(timeUnitCount.toLong())
 
-        val startTime = System.currentTimeMillis()
-        for (i in 1..(requestsLimitCount + 1)) {
-            limiter.acquire()
-        }
-        val requestsTime = System.currentTimeMillis() - startTime
+        val requestsTime = getRequestsTime(limiter, requestsLimitCount + 1)
+
         if (requestsTime <= limitTime)
             throw AssertionFailedError("", limitTime, requestsTime)
-    }
-
-    @Test
-    fun test() {
-        val timeUnit = SECONDS
-        val timeUnitCount = 1
-        val requestsLimitCount = 3
-        val limiter = ApiRequestLimiter.builder()
-                .add(requestsLimitCount, timeUnit, timeUnitCount, true)
-                .build()
-
-        limiter.use {
-            for (i in 1..4)
-                System.out.println(i.toString() + ": " + getRequestsTime(limiter, i))
-        }
-    }
-
-    private fun getRequestsTime(limiter: ApiRequestLimiter, requestsCount: Int): Long {
-        val startTime = System.currentTimeMillis()
-        for (i in 1..requestsCount) {
-            limiter.acquire()
-        }
-        return System.currentTimeMillis() - startTime
     }
 
     @Test
@@ -57,11 +31,7 @@ class ApiRequestLimiter {
                 .build()
         val limitTime = timeUnit.toMillis(timeUnitCount.toLong())
 
-        val startTime = System.currentTimeMillis()
-        for (i in 1..(requestsLimitCount - 1)) {
-            limiter.acquire()
-        }
-        val requestsTime = System.currentTimeMillis() - startTime
+        val requestsTime = getRequestsTime(limiter, requestsLimitCount - 1)
 
         if (requestsTime >= limitTime)
             throw AssertionFailedError("Requests time above or equal limit time:", limitTime, requestsTime)
@@ -77,13 +47,17 @@ class ApiRequestLimiter {
                 .build()
         val limitTime = timeUnit.toMillis(timeUnitCount.toLong())
 
-        val startTime = System.currentTimeMillis()
-        for (i in 1..(requestsLimitCount + 1)) {
-            limiter.acquire()
-        }
-        val requestsTime = System.currentTimeMillis() - startTime
+        val requestsTime = getRequestsTime(limiter, requestsLimitCount + 1)
 
         if (requestsTime <= limitTime)
             throw AssertionFailedError("Requests time below or equal limit time:", limitTime, requestsTime)
+    }
+
+    private fun getRequestsTime(limiter: ApiRequestLimiter, requestsCount: Int): Long {
+        val startTime = System.currentTimeMillis()
+        for (i in 1..requestsCount) {
+            limiter.acquire()
+        }
+        return System.currentTimeMillis() - startTime
     }
 }

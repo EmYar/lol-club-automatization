@@ -17,8 +17,8 @@ public class ApiFabric implements AutoCloseable {
     private SummonerApi summonerApi;
 
     private ApiFabric() {
-        limiter = ApiRequestLimiter.builder()
-                .add(20, TimeUnit.SECONDS, 1)
+        limiter = ApiRequestLimiter.Companion.builder()
+                .add(20, TimeUnit.SECONDS, 1, true)
                 .add(100, TimeUnit.MINUTES, 2, false)
                 .build();
     }
