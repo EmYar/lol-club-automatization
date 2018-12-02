@@ -7,25 +7,19 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-class UserParsingHelper : EntityParsingHelper<User>(
-        "1J_rjMFYuTI8FBGqBU9EwN2hQCulDuL8K3it_eFOZfTA",
-        "Участники",
-        "A2:G",
-        2) {
+class UserParser : EntityParser<User>(
+        "1J_rjMFYuTI8FBGqBU9EwN2hQCulDuL8K3it_eFOZfTA", //todo emelyanov move to resources
+        "Участники", //todo emelyanov move to resources
+        "A2:G", //todo emelyanov move to resources
+        2) { //todo emelyanov move to resources
 
     override fun parseEntity(row: List<Any>, rowNum: Int): User {
         val oldNames = (row[4] as String).split("; ")
                 .filter { StringUtils.isNotBlank(it) }
                 .toMutableSet()
         val joinDate =
-                if (row.size == 7)
-                    try {
-                        LocalDate.parse(row[6] as CharSequence, FORMATTER)
-                    } catch (e: DateTimeParseException) {
-                        LocalDate.parse(row[6] as CharSequence, SECOND_FORMATTER)
-                    }
-                else
-                    null
+                if (row.size == 7) parseDate(row[6] as CharSequence)
+                else null
 
         return User(spreadsheetId,
                 sheetId,
@@ -45,8 +39,23 @@ class UserParsingHelper : EntityParsingHelper<User>(
                         entity.oldNames?.joinToString("; ") ?: "")))
     }
 
+    private fun parseDate(charSequence: CharSequence): LocalDate? {
+        for (formatter in FORMATTERS) try {
+            return LocalDate.parse(charSequence, formatter)
+        } catch (e: DateTimeParseException) {
+        }
+        return null
+    }
+
     companion object {
-        private val FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yy")
-        private val SECOND_FORMATTER = DateTimeFormatter.ofPattern("d.MM.yy")
+        private val FORMATTERS = listOf(
+                DateTimeFormatter.ofPattern("d.M.yy"),
+                DateTimeFormatter.ofPattern("dd.M.yy"),
+                DateTimeFormatter.ofPattern("d.MM.yy"),
+                DateTimeFormatter.ofPattern("dd.MM.yy"),
+                DateTimeFormatter.ofPattern("d.M.yyyy"),
+                DateTimeFormatter.ofPattern("dd.M.yyyy"),
+                DateTimeFormatter.ofPattern("d.MM.yyyy"),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy"))
     }
 }

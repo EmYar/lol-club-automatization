@@ -12,11 +12,15 @@ object Main {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        SysOutOverSLF4J.sendSystemOutAndErrToSLF4J()
+        try {
+            SysOutOverSLF4J.sendSystemOutAndErrToSLF4J()
 
-        LOG.info(args.mapNotNull { TaskCommand.fromCommand(it)?.task }
-                .flatMap(Task::run)
-                .map { TaskResult::toString }
-                .joinToString { "\n" })
+            LOG.info(args.mapNotNull { TaskCommand.fromCommand(it)?.task }
+                    .flatMap(Task::run)
+                    .map { TaskResult::toString }
+                    .joinToString { "\n" })
+        } finally {
+            ApiFabric.close()
+        }
     }
 }

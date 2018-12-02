@@ -22,7 +22,7 @@ open class RequestsRateLimit(protected val requestsCount: Int, timeUnit: TimeUni
     }
 
     fun shutdown() {
-        cooldown!!.cancel()
+        cooldown?.cancel()
     }
 
     protected open fun shouldWait(): Boolean {
