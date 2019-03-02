@@ -1,29 +1,31 @@
 package com.company.tasks
 
 import com.company.ApiFabric
-import com.company.googledrive.Parser
+import com.company.googledrive.GDriveService
 import com.company.googledrive.entity.User
 import com.company.lolapi.LolApi
 import com.company.lolapi.Summoner
 import com.company.tasks.NamesUpdater.UpdateResult.Result
 import com.google.common.base.Charsets
 import com.google.common.io.Resources
-import one.util.streamex.StreamEx
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import java.io.IOException
 
 class NamesUpdater : Task {
 
+    @Suppress("UnstableApiUsage")
     private val apiKey = Resources.toString(Resources.getResource("lol_api_key"), Charsets.UTF_8)
 
     override fun run(): List<TaskResult> {
         LOG.info("NamesUpdater started")
         return try {
-            val users = Parser.get(User::class)
+            val users = GDriveService.get(User::class)
             LOG.info("{} users parsed", users.size)
-            save(users.filterNot { StringUtils.isAllBlank(it.accountId, it.name) }
-                    .mapNotNull { process(it, ApiFabric.getLolApi()) }
+            val lolApi = ApiFabric.lolApi
+            save(users.asSequence()
+                    .filterNot { StringUtils.isAllBlank(it.accountId, it.name) }
+                    .mapNotNull { process(it, lolApi) }
                     .toList())
         } catch (e: IOException) {
             LOG.error("Failed to update names", e)
@@ -56,12 +58,13 @@ class NamesUpdater : Task {
             lolApi.getSummonerByName(user.name, apiKey).execute().body()
     }
 
-    private fun save(result: List<UpdateResult>): List<UpdateResult> {
-        Parser.update(User::class,
-                result.filterNot { it -> it.status == Result.NOT_MATCH }
+    private fun save(results: List<UpdateResult>): List<UpdateResult> {
+        GDriveService.update(User::class,
+                results.asSequence()
+                        .filterNot { it -> it.status == Result.NOT_MATCH }
                         .mapNotNull(UpdateResult::user)
                         .toList())
-        return result
+        return results
     }
 
     companion object {
@@ -70,9 +73,9 @@ class NamesUpdater : Task {
 
     data class UpdateResult(val user: User?, val summoner: Summoner?, val status: Result?) : TaskResult {
         override fun toString(): String {
-            return StreamEx.of("NamesUpdater:", user?.accountId, user?.name, status)
-                    .nonNull()
-                    .joining(" ")
+            return arrayOf("NamesUpdater:", user?.accountId, user?.name, status)
+                    .filterNotNull()
+                    .joinToString(" ")
         }
 
         enum class Result { NAME_UPDATED, ACCOUNT_ID_ADDED, NOT_MATCH }

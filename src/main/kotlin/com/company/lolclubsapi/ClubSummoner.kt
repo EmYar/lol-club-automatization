@@ -1,8 +1,7 @@
 package com.company.lolclubsapi
 
 data class ClubSummoner(
-        var id: String = "",
-        var lolAccountId: String = "",
-        var summonerName: String = "",
-        var avatar: String = "",
-        var currentClub: String = "")
+        val lol_account_id: String,
+        val summoner_name: String,
+//        val avatar: String,
+        val current_club: Long)

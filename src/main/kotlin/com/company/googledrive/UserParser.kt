@@ -8,13 +8,13 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
 class UserParser : EntityParser<User>(
-        "1J_rjMFYuTI8FBGqBU9EwN2hQCulDuL8K3it_eFOZfTA", //todo emelyanov move to resources
-        "Участники", //todo emelyanov move to resources
-        "A2:G", //todo emelyanov move to resources
-        2) { //todo emelyanov move to resources
+        "1J_rjMFYuTI8FBGqBU9EwN2hQCulDuL8K3it_eFOZfTA", //todo move to resources
+        "Участники", //todo move to resources
+        "A2:G", //todo move to resources
+        2) { //todo move to resources
 
     override fun parseEntity(row: List<Any>, rowNum: Int): User {
-        val oldNames = (row[4] as String).split("; ")
+        val oldNames = (row[4] as String).split("; ").asSequence()
                 .filter { StringUtils.isNotBlank(it) }
                 .toMutableSet()
         val joinDate =
@@ -29,6 +29,7 @@ class UserParser : EntityParser<User>(
                 row[2] as String,
                 row[3] as String,
                 oldNames,
+                row[5] as String,
                 joinDate)
     }
 
@@ -40,9 +41,10 @@ class UserParser : EntityParser<User>(
     }
 
     private fun parseDate(charSequence: CharSequence): LocalDate? {
-        for (formatter in FORMATTERS) try {
-            return LocalDate.parse(charSequence, formatter)
-        } catch (e: DateTimeParseException) {
+        for (formatter in FORMATTERS) {
+            try {
+                return LocalDate.parse(charSequence, formatter)
+            } catch (e: DateTimeParseException) {}
         }
         return null
     }

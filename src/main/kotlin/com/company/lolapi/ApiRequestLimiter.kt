@@ -1,9 +1,10 @@
 package com.company.lolapi
 
+import java.io.Closeable
 import java.util.concurrent.TimeUnit
 import java.util.function.Supplier
 
-class ApiRequestLimiter private constructor(private val limits: List<RequestsRateLimit>) : AutoCloseable {
+class ApiRequestLimiter private constructor(private val limits: List<RequestsRateLimit>) : Closeable {
 
     fun execute(runnable: Runnable) {
         acquire()

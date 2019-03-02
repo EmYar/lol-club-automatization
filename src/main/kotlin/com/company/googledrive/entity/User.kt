@@ -11,6 +11,7 @@ class User(spreadsheetId: String,
            var vkPage: String,
            var discord: String,
            var oldNames: MutableSet<String>?,
+           role: String,
            var joinDate: LocalDate?)
     : GDriveEntity(spreadsheetId, sheetName, row) {
 
@@ -24,11 +25,15 @@ class User(spreadsheetId: String,
             field = value
         }
 
-    fun getRole(): Role {
-        throw UnsupportedOperationException();
-    }
+    val role = Role.fromCaption(role)
 
-    fun getAbsences(): List<Absence> {
-        throw UnsupportedOperationException();
+    fun getNames() : List<String> {
+        return if (oldNames == null)
+            listOf(name)
+        else {
+            val list = oldNames!!.toMutableList()
+            list.add(name)
+            list
+        }
     }
 }

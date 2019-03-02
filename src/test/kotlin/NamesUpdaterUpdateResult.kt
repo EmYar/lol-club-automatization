@@ -8,7 +8,7 @@ class NamesUpdaterUpdateResult {
 
     @Test
     fun `To string`() {
-        val user = User("", "", 0, "123", "User", "", "", null, null)
+        val user = User("", "", 0, "123", "User", "", "", null, "", null)
         val summoner = Summoner(0, "User", "", "", "", "")
         val updateResult = NamesUpdater.UpdateResult(user, summoner, NamesUpdater.UpdateResult.Result.ACCOUNT_ID_ADDED)
 

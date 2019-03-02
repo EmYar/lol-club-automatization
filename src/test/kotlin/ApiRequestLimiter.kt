@@ -12,7 +12,7 @@ class ApiRequestLimiter {
     fun `Clubs api test`() {
         ApiFabric.use { apiFabric ->
             val token = "PVPNET_TOKEN_RU=eyJkYXRlX3RpbWUiOjE1NDI5NzY4ODM2NTAsImdhc19hY2NvdW50X2lkIjoyMDAyNDMwNzksInB2cG5ldF9hY2NvdW50X2lkIjoyMDAyNDMwNzksInN1bW1vbmVyX25hbWUiOiJcdTA0MjJcdTA0MzBcdTA0MzdcdTA0MzhcdTA0M2FcdTA0NDEiLCJ2b3VjaGluZ19rZXlfaWQiOiI5MDM0NzUyYjJiNDU2MDQ0YWU4N2YyNTk4MmRhZDA3ZCIsInNpZ25hdHVyZSI6InFzb3ROWStKN3F0UVVIWFRtUjBva1FoSWtrbW0vTUNTZFhmYW0rZ08rZ1lxMGFXR1VIakdRVytxK0t5NUpidVAwbHNjZ1RBY3htTDNZclIveFNQNEhiSm41bURLbEh3eEF4QVN4K3g4VE1aVjhLQkdwRGhUZXJESWtwQ0tnZFZmUjB3ODVEdEYycTNVYm1jb1F0TFgwZmZvdUUveG9JNnBlNjhhN1FFY3BnVT0ifQ%3D%3D"
-            val api = apiFabric.getLolClubApi()
+            val api = apiFabric.lolClubsApi
             val result = api.getStageScores(14, 43, token).execute().body()
             assertTrue(result?.results?.isEmpty() == false)
         }
